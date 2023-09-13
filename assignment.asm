@@ -40,11 +40,11 @@
     total_sales_report db " Total sales               : RM ","$"
     total_discount_report db " Total discount            : RM ","$"
     items_sales_report db " Product Sales:","$"
-    product1_report db " TechNova X10              : RM ","$"
-    product2_report db " SonicWave HD800           : RM ","$"
-    product3_report db " TabGenius 12 Pro          : RM ","$"
-    product4_report db " TimeSync Elite            : RM ","$"
-    product5_report db " XPlay Prism Gaming Console: RM ","$"
+    product1_report db " 1.Xiaomi Redmi Airdots			         RM $","$"
+    product2_report db " 2.Anker PowerCore 10,000mAh		     RM ","$"
+    product3_report db " 3.Mi Band 4		                     RM ","$"
+    product4_report db " 4.Spigen Liquid Air Armor Phone Case    RM ","$"
+    product5_report db " 5.Google Chromecast                     RM ","$"
     total_attempt_report db " Number of attempt: ","$"
 
     ;variable for ending message
@@ -53,10 +53,10 @@
     ;variable for menu
     menu_title db "                       MENU $"
 	str1 db "================================================ $"
- 	product1 db "1.Xiaomi Redmi Airdots			RM65 $"
-	product2 db "2.Anker PowerCore 10,000mAh		RM99 $"
-	product3 db "3.Mi Band 4		                RM85 $"
-	product4 db "4.Spigen Liquid Air Armor Phone Case    RM39 $"
+ 	product1 db "1.Xiaomi Redmi Airdots			RM 65 $"
+	product2 db "2.Anker PowerCore 10,000mAh		RM 99 $"
+	product3 db "3.Mi Band 4		                RM 85 $"
+	product4 db "4.Spigen Liquid Air Armor Phone Case    RM 39 $"
 	product5 db "5.Google Chromecast                     RM149 $"
 	str2 db "Sales Order No : $"
 	varSales db ?
@@ -70,8 +70,16 @@
 	price2  	dw 9900
 	price3  	dw 8500
 	price4  	dw 3900
-	price5  	dw 14900
-	subtotal	dw 0h
+	price5  	dw 14950
+	;subtotal	dw 0h
+
+    ;variable for calculateBalance
+    cash dw ?
+	subtotal dw ?
+	balance dw ?
+	message db "Your balance is: RM ", "$" 
+	message2 db "Your remaining amount is:RM ","$"
+	message3 db "Payment successfully ! ", "$"
 
 .code
 
@@ -86,12 +94,12 @@ login:
 
 main_menu:
     call menu
+    call calculateDiscountedPrice
+    call printOutput
 
 Sales:
-    call calculatePromotion
-    ;call calculateDiscountedPrice
 
-    ;call n_line
+    
 
 sales_receipt:
     ;call receipt
@@ -391,7 +399,7 @@ calculatePromotion proc
 
     ;compare subtotal
     cmp ax,300
-    jl continue_endPromotion
+    jl endPromotion
 
     ;div 100 to separate ax,dx
     mov bx,100
@@ -442,14 +450,15 @@ calc_12_decimal_promotion:
     mul bl
     add ax,result_12
     mov result_12,ax
-    jmp promotion_price
 
-continue_endPromotion:
-    jmp endPromotion
+endPromotion:
+    ret
 
-promotion_price:
+calculatePromotion endp
 
-    ;print total discount
+printOutput proc
+
+    ;print price
     ;separate result_34
     xor ax,ax
     mov ax,result_34
@@ -568,10 +577,9 @@ print_result_remainder_34:
     ;print n_line
     call n_line
 
-endPromotion:
     ret
 
-calculatePromotion endp
+printOutput endp
 
 calculateDiscountedPrice proc
 
@@ -595,7 +603,7 @@ calculateDiscountedPrice proc
 
     ;compare subtotal
     cmp ax,300
-    jl continue_endDiscounted
+    jl endDiscounted
 
     ;div 100 to separate ax,dx
     mov bx,100
@@ -646,111 +654,6 @@ calc_12_decimal_discounted:
     mul bl
     add ax,result_12
     mov result_12,ax
-    jmp discounted_price
-
-continue_endDiscounted:
-    jmp endDiscounted
-
-discounted_price:
-
-    ;print discounted price
-    ;separate result_34
-    xor ax,ax
-    mov ax,result_34
-    mov bx,10
-    div bx
-    mov result_remainder_34,dl
-
-    xor dx,dx
-    div bx
-    mov result_remainder_34_extra,dl
-    mov result_quotient_34,al
-
-    ;print first number
-    xor ax,ax
-    xor dx,dx
-    mov dl,result_quotient_34
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print second number
-    mov dl,result_remainder_34_extra
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print thrid
-    mov dl,result_remainder_34
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print '.'
-    xor ax,ax
-    mov dl,'.'
-    mov ah,02h
-    int 21h
-
-    ;separate deci_result
-    xor dx,dx
-    xor ax,ax
-    mov ax,result_12
-    mov bx,100
-    div bx
-    mov result_quotient_12,al
-    mov result_remainder_12,dl
-
-    ;separate result_quotient
-    xor dx,dx
-    xor ax,ax
-    mov al,result_quotient_12
-    mov bl,10
-    div bl
-
-    ;store
-    mov result_quotient_num1,al
-    mov result_quotient_num2,ah
-
-    ;print first number
-    xor ax,ax
-    mov dl,result_quotient_num1
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print second number
-    xor ax,ax
-    mov dl,result_quotient_num2
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;separate result_remainder
-    xor dx,dx
-    xor ax,ax
-    mov al,result_remainder_12
-    mov bl,10
-    div bl
-    mov result_remainder_num1,al
-    mov result_remainder_num2,ah
-
-    ;print third number
-    xor ax,ax
-    mov dl,result_remainder_num1
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print forth number
-    xor ax,ax
-    mov dl,result_remainder_num2
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print n_line
-    call n_line
 
 endDiscounted:
     ret
@@ -763,7 +666,7 @@ calculateTax proc
     xor dx,dx
 
     ;separate decimal
-    mov ax,payment_price
+    mov ax,subtotal
     mov bx,100
     div bx
 
@@ -826,128 +729,6 @@ calc_12_decimal_tax:
     mul bl
     add ax,result_12
     mov result_12,ax
-    jmp promotion_price
-
-tax_price:
-
-    ;print total tax
-    ;separate result_34
-    xor ax,ax
-    mov ax,result_34
-    mov bx,10
-    div bx
-    mov result_remainder_34,dl
-    
-    ;check if al more than 9
-    cmp al,10
-    jge thou_place_tax
-    mov result_remainder_34_extra,10
-    mov result_quotient_34,al
-    jmp continue_print_34
-
-thou_place_tax:
-    xor dx,dx
-    div bx
-    mov result_remainder_34_extra,dl
-    mov result_quotient_34,al
-
-continue_print_34_tax:
-
-    ;check if result_quotient_34 is 0
-    cmp result_quotient_34,0
-    je end_continue_print_34_tax
-
-    ;print first number
-    xor ax,ax
-    xor dx,dx
-    mov dl,result_quotient_34
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-end_continue_print_34_tax:
-    ;check value of result_remainder_34_extra
-    cmp result_remainder_34_extra,10
-    jl print_result_remainder_34_extra_tax
-    jmp print_result_remainder_34_tax
-
-print_result_remainder_34_extra_tax:
-    mov dl,result_remainder_34_extra
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-print_result_remainder_34_tax:
-    mov dl,result_remainder_34
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print '.'
-    xor ax,ax
-    mov dl,'.'
-    mov ah,02h
-    int 21h
-
-    ;separate deci_result
-    xor dx,dx
-    xor ax,ax
-    mov ax,result_12
-    mov bx,100
-    div bx
-    mov result_quotient_12,al
-    mov result_remainder_12,dl
-
-    ;separate result_quotient
-    xor dx,dx
-    xor ax,ax
-    mov al,result_quotient_12
-    mov bl,10
-    div bl
-
-    ;store
-    mov result_quotient_num1,al
-    mov result_quotient_num2,ah
-
-    ;print first number
-    xor ax,ax
-    mov dl,result_quotient_num1
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print second number
-    xor ax,ax
-    mov dl,result_quotient_num2
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;separate result_remainder
-    xor dx,dx
-    xor ax,ax
-    mov al,result_remainder_12
-    mov bl,10
-    div bl
-    mov result_remainder_num1,al
-    mov result_remainder_num2,ah
-
-    ;print third number
-    xor ax,ax
-    mov dl,result_remainder_num1
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print forth number
-    xor ax,ax
-    mov dl,result_remainder_num2
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print n_line
-    call n_line
 
     ret
 
@@ -959,7 +740,7 @@ calculatePriceAfterTax proc
     xor dx,dx
 
     ;separate decimal
-    mov ax,payment_price
+    mov ax,subtotal
     mov bx,100
     div bx
 
@@ -1023,108 +804,176 @@ calc_12_decimal_payment:
     add ax,result_12
     mov result_12,ax
 
-    ;print discounted price
-    ;separate result_34
-    xor ax,ax
-    mov ax,result_34
-    mov bx,10
-    div bx
-    mov result_remainder_34,dl
-
-    xor dx,dx
-    div bx
-    mov result_remainder_34_extra,dl
-    mov result_quotient_34,al
-
-    ;print first number
-    xor ax,ax
-    xor dx,dx
-    mov dl,result_quotient_34
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print second number
-    mov dl,result_remainder_34_extra
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print thrid
-    mov dl,result_remainder_34
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print '.'
-    xor ax,ax
-    mov dl,'.'
-    mov ah,02h
-    int 21h
-
-    ;separate deci_result
-    xor dx,dx
-    xor ax,ax
-    mov ax,result_12
-    mov bx,100
-    div bx
-    mov result_quotient_12,al
-    mov result_remainder_12,dl
-
-    ;separate result_quotient
-    xor dx,dx
-    xor ax,ax
-    mov al,result_quotient_12
-    mov bl,10
-    div bl
-
-    ;store
-    mov result_quotient_num1,al
-    mov result_quotient_num2,ah
-
-    ;print first number
-    xor ax,ax
-    mov dl,result_quotient_num1
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print second number
-    xor ax,ax
-    mov dl,result_quotient_num2
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;separate result_remainder
-    xor dx,dx
-    xor ax,ax
-    mov al,result_remainder_12
-    mov bl,10
-    div bl
-    mov result_remainder_num1,al
-    mov result_remainder_num2,ah
-
-    ;print third number
-    xor ax,ax
-    mov dl,result_remainder_num1
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print forth number
-    xor ax,ax
-    mov dl,result_remainder_num2
-    add dl,30h
-    mov ah,02h
-    int 21h
-
-    ;print n_line
-    call n_line
-
     ret
 
 calculatePriceAfterTax endp
+
+balanceProc proc
+
+    mov ax,cash
+	mov bx,subtotal
+
+	cmp ax,bx
+	jg calculate_balance
+	jl calculate_remaining
+	je continue_display_message
+
+calculate_balance:
+    sub ax,bx   ; Calculate balance (cashReceive - subtotal)
+    mov balance,ax
+
+    ;clear dx
+    xor dx,dx
+
+    ;mov balance to register
+    mov ax,balance
+
+    ;store whole and decimal
+    mov whole_number,ax
+    mov decimal_number,dl
+
+    ;whole number
+	;mov data to registers
+    xor dx,dx
+    xor ax,ax
+	mov ax,whole_number
+
+    ;div 100 to separate ax,dx
+    mov bx,100
+    div bx
+
+    ;store ax,dx into variable
+    mov num_12_whole,dl
+    mov num_34_whole,ax
+    
+    ;check dx
+    cmp [num_12_whole],0
+    jg calc_12_whole_balance
+    jmp calc_34_whole_balance
+
+calc_12_whole_balance:
+    xor dx,dx
+    mov al,num_12_whole
+    mov bx,100
+    div bx
+    mov result_12,dx
+    mov result_extra,al
+
+    ;multiply result_12 with 100
+    xor ax,ax
+    mov ax,result_12
+    mov bx,100
+    mul bx
+    mov result_12,ax
+
+calc_34_whole_balance:
+    xor dx,dx
+    mov ax,num_34_whole
+    add al,result_extra
+    mov result_34,ax
+
+calc_12_decimal_balance:
+    xor ax,ax
+    xor dx,dx
+    mov al,decimal_number
+    add ax,result_12
+    mov result_12,ax
+    jmp display_balance
+
+continue_display_message:
+    jmp display_message
+
+display_balance:
+
+    ;print balance message
+    mov ah,09h
+    lea dx,message
+    int 21h
+    xor ax,ax
+    xor dx,dx
+    call printOutput
+	jmp end_program
+
+calculate_remaining:
+	SUB bx,ax		; Calculate remaining (subtotal - cashReceive)		
+	mov balance,bx
+
+    ;clear dx
+    xor dx,dx
+
+    ;separate decimal
+    mov ax,balance
+
+    ;store whole and decimal
+    mov whole_number,ax
+    mov decimal_number,dl
+
+    ;whole number
+	;mov data to registers
+    xor dx,dx
+    xor ax,ax
+	mov ax,whole_number
+
+    ;div 100 to separate ax,dx
+    mov bx,100
+    div bx
+
+    ;store ax,dx into variable
+    mov num_12_whole,dl
+    mov num_34_whole,ax
+    
+    ;check dx
+    cmp [num_12_whole],0
+    jg calc_12_whole_remainding
+    jmp calc_34_whole_remainding
+
+calc_12_whole_remainding:
+    xor dx,dx
+    mov al,num_12_whole
+    mov bx,100
+    div bx
+    mov result_12,dx
+    mov result_extra,al
+
+    ;multiply result_12 with 100
+    xor ax,ax
+    mov ax,result_12
+    mov bx,100
+    mul bx
+    mov result_12,ax
+
+calc_34_whole_remainding:
+    xor dx,dx
+    mov ax,num_34_whole
+    add al,result_extra
+    mov result_34,ax
+
+calc_12_decimal_remainding:
+    xor ax,ax
+    xor dx,dx
+    mov al,decimal_number
+    add ax,result_12
+    mov result_12,ax
+
+display_remaining:
+    mov ah,09h
+    lea dx,message2
+    int 21h
+    xor ax,ax
+    xor dx,dx
+    call printOutput
+	jmp end_program
+
+display_message:
+	MOV AH, 09h
+	lea dx, newline     	; DOS function to print a string
+	lea dx, message3  	; Load the message 
+	INT 21h 		; Call DOS to print the message
+
+endBalance:
+    ret
+
+balanceProc endp
 
 report proc
 
@@ -1246,16 +1095,6 @@ receipt proc
     call line
     call n_line
 
-    ;print cashier
-    mov ah,09h
-    lea dx,cashier_receipt
-    int 21h
-    call n_line
-
-    ;print line
-    call line
-    call n_line
-
     ;print category
     mov ah,09h
     lea dx,category_receipt
@@ -1354,7 +1193,5 @@ receipt proc
     ret
 
 receipt endp
-
-
 
 end main
