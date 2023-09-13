@@ -1,6 +1,6 @@
 .model small
 .stack 100
-.data
+.data	
 	fileHandler dw ?
 	File 			db "text.txt",0
 	buffer 			db 100 dup (?)
@@ -27,17 +27,23 @@
 	correctRegister		db 0h
 	registerSuccessMsg	db 0dh,0ah,"You have registered new user successfully.",'$'
 	registerData		db 30 dup (?)
-	welcomeLogo			db "*     *     *  ******   *       ******  *******    *       *   ****** ",0dh,0ah,"$"
-	welcomeLogo2			db " *   * *   *   *        *       *       *     *    **     **   *",0dh,0ah,"$"
-	welcomeLogo3			db " * *   *  *    ******   *       *       *     *    * *   * *   ******",0dh,0ah,"$"
-	welcomeLogo4			db "  **    * *    *        *       *       *     *    *  * *  *   *",0dh,0ah,"$"
-	welcomeLogo5			db "  *      *     ******   ******  ******  *******   *    *    *  ******",0dh,0ah,"$"
-	logo				db " *                ************      *            *",0dh,0ah,"$"
-	logo2				db " *                *                   *        *",0dh,0ah,"$"
-	logo3				db " *                *     *******         *  *",0dh,0ah,"$"
-	logo4				db " *                *           *           *",0dh,0ah,"$"
-	logo5				db " ***********      *************           *        Sdn.Bhd.",0dh,0ah,"$"
-
+	welcomeLogo		db "*     *     *  ******   *       ******  *******    *       *   ****** ",0dh,0ah
+				db " *   * *   *   *        *       *       *     *    **     **   *",0dh,0ah
+				db " * *   *  *    ******   *       *       *     *    * *   * *   ******",0dh,0ah
+				db "  **    * *    *        *       *       *     *    *  * *  *   *",0dh,0ah
+				db "  *      *     ******   ******  ******  *******   *    *    *  ******",0dh,0ah,"$"
+	logo			db "  .----------------.   .----------------.   .----------------.",0dh,0ah
+				db " | .--------------. | | .--------------. | | .--------------. |",0dh,0ah
+				db " | |   _____      | | | |    ______    | | | |  ____  ____  | |",0dh,0ah
+				db " | |  |_   _|     | | | |  .' ___  |   | | | | |_  _||_  _| | |",0dh,0ah
+				db " | |    | |       | | | | / .'   \_|   | | | |   \ \  / /   | |",0dh,0ah
+				db " | |    | |   _   | | | | | |    ____  | | | |    \ \/ /    | |",0dh,0ah
+				db " | |   _| |__/ |  | | | | \ `.___]  _| | | | |    _|  |_    | |",0dh,0ah
+				db " | |  |________|  | | | |  `._____.'   | | | |   |______|   | |",0dh,0ah
+				db " | |              | | | |              | | | |              | |",0dh,0ah
+				db " | '--------------' | | '--------------' | | '--------------' |",0dh,0ah
+				db "  '----------------'   '----------------'   '----------------' ",0dh,0ah,0dh,0ah
+				db " **************************************************************",0dh,0ah,"$"
 .code
 main proc 
 	mov ax,@data
@@ -46,14 +52,6 @@ main proc
 	lea dx,newline
 	int 21h
 	lea dx,welcomeLogo
-	int 21h
-	lea dx,welcomeLogo2
-	int 21h
-	lea dx,welcomeLogo3
-	int 21h
-	lea dx,welcomeLogo4
-	int 21h
-	lea dx,welcomeLogo5
 	int 21h
 	
 openFile:
@@ -378,6 +376,7 @@ checkPassword:
 	jne incorrectPass
 
 successLogin:
+	call clearScreen
 	mov ah,09h
 	lea dx,greet
 	int 21h
@@ -389,14 +388,7 @@ successLogin:
 	int 21h
 	lea dx,logo
 	int 21h
-	lea dx,logo2
-	int 21h
-	lea dx,logo3
-	int 21h
-	lea dx,logo4
-	int 21h
-	lea dx,logo5
-	int 21h
+
 	;change here to login menu,please include the registration in the menu
 	call registration	
 	jmp exitProgram
@@ -452,6 +444,21 @@ register:
 	mov correctRegister,1
 	jmp openFile
 
-	
 registration endp
+
+clearScreen proc
+	mov ah,06h
+	mov al,0
+	mov bh,07h
+	mov cx,0
+	mov dx,184Fh
+	int 10h
+	mov ah,02h
+	mov bh,0
+	mov dh,0
+	mov dl,0
+	int 10h
+	ret
+clearScreen endp
+
 end main
