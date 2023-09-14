@@ -64,14 +64,12 @@
 	varQty db ?
 	str4 db "Press any key to continue adding order. (N=No) : $"
 	varAdd db ?
-	newline db 0dh,0ah,"$"
 	errorMsg db "Invalid input. Please try again !$"
 	price1  	dw 6500
 	price2  	dw 9900
 	price3  	dw 8500
 	price4  	dw 3900
-	price5  	dw 14950
-	;subtotal	dw 0h
+	price5  	dw 14900
 
     ;variable for calculateBalance
     cash dw ?
@@ -81,6 +79,52 @@
 	message2 db "Your remaining amount is:RM ","$"
 	message3 db "Payment successfully ! ", "$"
 
+    ;variable for register and login
+    fileHandler dw ?
+	File 			db "text.txt",0
+	buffer 			db 100 dup (?)
+	openErrorMsg 		db "Error occured when opening file$"
+	readErrorMsg 		db "Error occured when reading file$"
+	writeErrorMsg		db "Error occured when writing file$"
+	inputUser 		db 50 dup(?)
+	newline 		db 0dh,0ah,"$"
+	usrnamePrompt 		db 0dh,0ah,20h,01h,20h,"Enter username -> $"
+	newNamePrompt 		db 0dh,0ah,20h,01h,20h,"Enter New User Name -> $"
+	usrErrorMsg     	db 0dh,0ah,"Incorrect username. Please try again. :)",'$'
+	pwdErrorMsg     	db 0dh,0ah,"Incorrect password. Please try again. :)",'$'
+	successMsg      	db 0dh,0ah,"You have logged in successfully.",'$'
+	exitMsg         	db 0dh,0ah,"Exiting the program... Hope to see you again!!",'$'
+	pwdPrompt       	db 0dh,0ah,20h,01h,20h,"Enter password -> $"
+	newPwdPrompt    	db 0dh,0ah,20h,01h,20h,"Enter New User Password (12 alphanumeric)-> $"
+	inputPass     		db 12 dup(?)
+	Ast     		db "*"
+	greet			db "Hello $"
+	accessUser		db "manager$"
+	noAccessMsg		db 0dh,0ah,20h,01h,20h,"You have no permission to access registration. $"
+	registerUser		db 50 dup(?)
+	registerPass		db 12 dup(?)
+	correctRegister		db 0h
+	registerSuccessMsg	db 0dh,0ah,"You have registered new user successfully.",'$'
+	registerData		db 30 dup (?)
+	welcomeLogo		db "*     *     *  ******   *       ******  *******    *       *   ****** ",0dh,0ah
+				db " *   * *   *   *        *       *       *     *    **     **   *",0dh,0ah
+				db " * *   *  *    ******   *       *       *     *    * *   * *   ******",0dh,0ah
+				db "  **    * *    *        *       *       *     *    *  * *  *   *",0dh,0ah
+				db "  *      *     ******   ******  ******  *******   *    *    *  ******",0dh,0ah,"$"
+	logo			db "  .----------------.   .----------------.   .----------------.",0dh,0ah
+				db " | .--------------. | | .--------------. | | .--------------. |",0dh,0ah
+				db " | |   _____      | | | |    ______    | | | |  ____  ____  | |",0dh,0ah
+				db " | |  |_   _|     | | | |  .' ___  |   | | | | |_  _||_  _| | |",0dh,0ah
+				db " | |    | |       | | | | / .'   \_|   | | | |   \ \  / /   | |",0dh,0ah
+				db " | |    | |   _   | | | | | |    ____  | | | |    \ \/ /    | |",0dh,0ah
+				db " | |   _| |__/ |  | | | | \ `.___]  _| | | | |    _|  |_    | |",0dh,0ah
+				db " | |  |________|  | | | |  `._____.'   | | | |   |______|   | |",0dh,0ah
+				db " | |              | | | |              | | | |              | |",0dh,0ah
+				db " | '--------------' | | '--------------' | | '--------------' |",0dh,0ah
+				db "  '----------------'   '----------------'   '----------------' ",0dh,0ah,0dh,0ah
+				db " **************************************************************",0dh,0ah,"$"
+
+
 .code
 
 main proc
@@ -88,46 +132,380 @@ main proc
 	mov ax,@data
 	mov ds,ax
 
-login:
+    jmp skipcode
+login_proc:
 
+    mov ah,09h
+	lea dx,newline
+	int 21h
+	lea dx,welcomeLogo
+	int 21h
 
+    openFile:
+	mov ah,3dh		;function 3dh - open file
+	mov al,2	;010b	;access mode - read/write
+	lea dx,File		;address of filename
+	int 21h
 
-main_menu:
+	mov fileHandler,ax	;save handler
+	jc openError		;when error, cf=1
+
+	;read file
+	mov ah,3fh		;function 3fh - read file
+	mov bx,fileHandler	;ready handler
+	mov cx,100		;read 100 bytes in file
+	lea dx,buffer		;ready buffer
+	int 21h
+	jmp inpUsername
+
+	jc readError		;when error, cf=1
+
+    closeFile:
+	;close file
+	mov bx,fileHandler	;ready handler
+	mov ah,3eh		;function 3eh - close file
+	int 21h
+	mov ah,4ch
+	int 21h
+
+    openError:
+	mov ah,09h
+	lea dx,openErrorMsg
+	int 21h
+	mov ah,4ch		;terminate
+	mov al,01h		;error level=1
+	int 21h
+
+    readError:
+	mov ah,09h
+	lea dx,readErrorMsg
+	int 21h
+	mov ah,4ch		;terminate
+	mov al,02h		;error level=2
+	int 21h
+
+    inpUsername:
+	mov al,correctRegister
+	cmp al,1
+	je newUser
+	;print prompt
+	mov ah, 09h
+	lea dx, usrnamePrompt
+	int 21h
+	lea si,inputUser
+	mov di,si
+	jmp inputLoop
+
+    newUser:
+	mov ah,09h
+	lea dx,newNamePrompt
+	int 21h
+	lea si,registerUser
+	mov di,si
+	jmp inputLoop
+
+    inputLoop:
+	;input
+	mov ah, 01h
+	int 21h
+	cmp al,13
+	je inputDone
+	cmp al,8
+	je handleUsrBackspace
+	jne saveInput
+
+    saveInput:
+	mov [si],al
+	inc si
+	jmp inputLoop
+
+    handleUsrBackspace:
+	mov ah,02h
+	mov dl,' '
+	int 21h
+	cmp si,di
+	je inputLoop
+	mov dl,8
+	int 21h
+
+	dec si
+	inc cx
+	jmp inputLoop	
+
+    inputDone:
+	mov al,'*'
+	mov [si],al
+	mov al,correctRegister
+	cmp al,1
+	je newPassword
+	mov al,'$'
+	mov [si],al
+	
+	;setup
+	lea si, inputUser
+	lea di, buffer
+	jmp checkCharacter
+
+    newPassword:
+	mov ah,09h
+	lea dx,newPwdPrompt
+	int 21h
+	mov cx,12
+	lea si,registerPass
+	mov di,si
+	jmp newPass
+	
+    newPass:
+	cmp cx,0
+	je endPass
+	mov ah, 01h
+    	int 21h
+	cmp al,8	
+	je handleNewBackspace
+	mov [si], al
+    	inc si
+        dec cx
+	jmp newPass
+
+    endPass:
+	mov al,'#'
+	mov [si],al
+	lea si,registerUser
+	lea di,registerData
+
+	jmp registerProcess
+
+    handleNewBackspace:
+	mov ah,02h
+	mov dl,' '
+	int 21h
+	cmp si,di
+	je newPass
+	mov dl,8
+	int 21h
+
+	dec si
+	dec di
+	inc cx
+	jmp newPass
+
+    registerProcess:
+	mov al,[si]
+	mov [di],al
+	cmp al,'*'
+	je setUpRegister
+	inc si
+	inc di
+	jmp registerProcess
+
+    setUpRegister:
+	lea si,registerPass
+	inc di
+	jmp savePass
+
+    savePass:
+	mov al,[si]
+	mov [di],al
+	cmp al,'#'
+	je eliminateNull
+	inc si
+	inc di
+	jmp savePass
+
+    eliminateNull:
+	inc di
+	mov al,'$'
+	mov [di],al
+	mov cx,0
+	lea si,registerData
+	jmp countStringLength
+	
+    countStringLength:
+	mov al,[si]
+	cmp al,'$'
+	je registerSuccess
+	inc cx
+	inc si
+	jmp countStringLength
+
+    registerSuccess:
+	lea dx,registerData
+	mov bx,fileHandler
+	mov ah,40h
+	int 21h
+	jc WriteError 		; jump if there is an error
+	cmp ax,cx 		; was all the data written?
+	jne WriteError 		; no it wasn't - error!
+
+	mov ah,09h
+	lea dx,registerSuccessMsg
+	int 21h
+	jmp closeFile
+
+    WriteError:
+	mov ah,09h
+	lea dx,writeErrorMsg
+	int 21h
+	jmp exitProgram
+
+    checkCharacter:
+	mov al,[di]
+	cmp al,' '	
+	je incorrectUser
+	mov al,[si]
+	cmp al,[di]
+	je nextChar
+	mov cx,100
+	jne nextID
+
+    nextID:
+	mov al,[di]
+	cmp al,'#'
+	je skipSymbol
+	inc di
+	loop nextID
+
+    skipSymbol:
+	inc di
+	jmp checkCharacter
+
+    incorrectUser:
+	mov ah, 09h
+	lea dx, usrErrorMsg
+	int 21h
+	jmp inpUsername
+
+    nextChar:
+	inc si
+	inc di
+	mov al,[di]
+	cmp al,'*'
+	je restoreDI
+	jmp checkCharacter
+
+    restoreDI:
+	inc di	;skip symbol
+	mov bx,di
+	
+	jmp inpPassword
+
+    inpPassword:
+	mov ah, 09h
+	lea dx, pwdPrompt
+	int 21h
+	mov cx, 12   ; get 12 chars
+    lea si, inputPass ; buffer to hold password
+	jmp encryption
+
+    encryption:
+    ; get char typed
+    mov ah, 07h
+    int 21h
+	cmp al,13
+	je endString
+	cmp al,8	;backspace key
+	je handleBackspace
+	jne saveString
+
+    saveString:
+	; save in buffer
+    mov [si], al
+
+    ; Display Asterick
+    mov ah, 02h
+	mov dl,'*'
+    int 21h
+
+	; increase our buffer pointer
+    inc si
+    dec cx
+    jnz encryption ;continue until met 0
+
+	mov ah, 09h
+    lea dx,newline
+    int 21h
+
+    endString:
+	mov al,'$'
+	mov [si],al
+		
+	;set up
+    lea si,inputPass
+	lea di,buffer
+	mov di,bx
+    jmp checkPassword
+
+    handleBackspace:
+	cmp si,offset inputPass
+	je encryption
+
+	mov ah,02h
+	mov dl,8
+	int 21h
+	mov dl,' '
+	int 21h
+	mov dl,8
+	int 21h
+
+	dec si
+	dec di
+	inc cx
+
+	jmp encryption
+
+    checkPassword:
+	mov al, [di]
+	cmp al,'#'	
+	je incorrectPass
+	mov al, [si]
+	cmp al, [di]
+	je nextPass
+	jne incorrectPass
+
+    successLogin:
+	call clearScreen
+	mov ah,09h
+	lea dx,greet
+	int 21h
+	lea dx,inputUser
+	int 21h
+	lea dx,successMsg
+	int 21h
+	lea dx,newline
+	int 21h
+	lea dx,logo
+	int 21h
+
+	;change here to login menu,please include the registration in the menu
+	call registration	
+	jmp exitProgram
+
+    nextPass:
+	inc si
+	inc di
+	mov al,[di]
+	cmp al,'#'
+	je successLogin
+	jmp checkPassword
+
+    incorrectPass:
+	mov ah,09h
+	lea dx,pwdErrorMsg
+	int 21h
+	jmp inpPassword
+
+skipcode:
+
+menu_proc:
+
     call menu
-    call calculateDiscountedPrice
+    call calculatePriceAfterTax
     call printOutput
 
-Sales:
-
-    
-
-sales_receipt:
-    ;call receipt
-
-summary_report:
-    xor ax,ax
-    xor dx,dx
-    ;call report
-    ;call calculateTax
-    ;call calculatePriceAfterTax
-
-ending_message:
-    ;print thank you message
-    ;print line
-    ;call line
-    ;call n_line
-
-    ;print message
-    ;mov ah,09h
-    ;lea dx,end_thank_you
-    ;int 21h
-    ;call n_line
-
-    ;print line
-    ;call line
-
-endProgram:
-	;interrupt to exit
+exitProgram:
+	mov ah,09h
+	lea dx,exitMsg
+	int 21h
 	mov ah,4ch
 	int 21h
 
@@ -460,6 +838,7 @@ printOutput proc
 
     ;print price
     ;separate result_34
+    xor dx,dx
     xor ax,ax
     mov ax,result_34
     mov bx,10
@@ -655,6 +1034,21 @@ calc_12_decimal_discounted:
     add ax,result_12
     mov result_12,ax
 
+    ;check result_12 value
+    cmp [result_12],10000
+    jge extra_calc_decimal_discounted
+    jmp endDiscounted
+
+extra_calc_decimal_discounted:
+    xor ax,ax
+    xor dx,dx
+    mov ax,result_12
+    mov bx,10000
+    div bx
+    add ax,result_34
+    mov result_12,dx
+    mov result_34,ax
+
 endDiscounted:
     ret
 
@@ -804,6 +1198,22 @@ calc_12_decimal_payment:
     add ax,result_12
     mov result_12,ax
 
+    ;check result_12 value
+    cmp [result_12],10000
+    jge extra_calc_decimal_tax
+    jmp endTax
+
+extra_calc_decimal_tax:
+    xor ax,ax
+    xor dx,dx
+    mov ax,result_12
+    mov bx,10000
+    div bx
+    add ax,result_34
+    mov result_12,dx
+    mov result_34,ax
+
+endTax:
     ret
 
 calculatePriceAfterTax endp
@@ -1193,5 +1603,50 @@ receipt proc
     ret
 
 receipt endp
+
+registration proc
+	lea si,inputUser
+	lea di,accessUser
+
+checkManager:
+	mov al,[di]
+	cmp al,"$"
+	je register
+	mov al,[si]
+	cmp al,[di]
+	je checkNext
+	jne cannotAccess
+
+checkNext:
+	inc si
+	inc di
+	jmp checkManager
+
+cannotAccess:
+	mov ah,09h
+	lea dx,noAccessMsg
+	int 21h
+	ret
+
+register:
+	mov correctRegister,1
+	jmp openFile
+
+registration endp
+
+clearScreen proc
+	mov ah,06h
+	mov al,0
+	mov bh,07h
+	mov cx,0
+	mov dx,184Fh
+	int 10h
+	mov ah,02h
+	mov bh,0
+	mov dh,0
+	mov dl,0
+	int 10h
+	ret
+clearScreen endp
 
 end main
