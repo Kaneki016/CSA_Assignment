@@ -2,50 +2,64 @@
 .stack 100
 .data
     ;main file
-    total_attempt_main db 0
+    total_attempt dw 0
+    another_order db "Press Y to make another order. (N=No) : ",'$'
+    choice db ?
 
     ;variable for calculatePromotion, Discounted, Tax, PriceAfterTax
     whole_number dw ?
-    decimal_number db ?
+    decimal_number dw ?
+    total_number dw ?
     payment_price dw ?
-    num_12_whole db ?
-    num_34_whole dw ?
-    result_12 dw ?
-    result_34 dw ?
-    result_extra db ?
-    result_quotient_34 db ?
-    result_remainder_34 db ?
-    result_remainder_34_extra db ?
-    result_quotient_12 db ?
-    result_remainder_12 db ?
-    result_quotient_num1 db ?
-    result_quotient_num2 db ?
-    result_remainder_num1 db ?
-    result_remainder_num2 db ?
+    result_whole_thou db ?
+    result_whole_hund db ?
+    result_whole_single db ?
+    result_whole_tens db ?
+    result_decimal_hund db ?
+    result_decimal_remain dw ?
+    result_decimal_single db ?
+    result_decimal_tens db ?
+    result_decimal_thou db ?
+    whole_number_remainder dw ?
 
     ;variable for receipt
-    receipt_title_receipt db "                       Receipt","$"
-    cashier_receipt db "Cashier: ","$"
-    category_receipt db " Qty  Item                        Price       Total","$"
-    subtotal_title_receipt db " Subtotal        : RM ","$"
-    discount_title_receipt db " Discount (5%)   : RM ","$"
-    discounted_title_receipt db " Discounted Price: RM ","$"
-    total_price_receipt db " Total           : RM ","$"
-    tax_title_receipt db " Tax (6%)        : RM ","$"
-    thank_you_receipt db "Thank you for your purchase!","$"
+    receipt_title_receipt db "                       Receipt",'$'
+    cashier_receipt db "Cashier: ",'$'
+    category_receipt db " Qty  Item                                    Total",'$'
+    subtotal_title_receipt db " Subtotal        : RM ",'$'
+    discount_title_receipt db " Discount (5%)   : RM ",'$'
+    discounted_title_receipt db " Discounted Price: RM ",'$'
+    total_price_receipt db " Total           : RM ",'$'
+    tax_title_receipt db " Tax (6%)        : RM ",'$'
+    thank_you_receipt db "Thank you for your purchase!",'$'
+    receipt_content db ?
 
     ;variable for report
-    single_line db "-----------------------------------------------------","$"
-    summary_title_report db "            LGY POS System Summary Report","$"
-    total_sales_report db " Total sales               : RM ","$"
-    total_discount_report db " Total discount            : RM ","$"
-    items_sales_report db " Product Sales:","$"
-    product1_report db " 1.Xiaomi Redmi Airdots			         RM $","$"
-    product2_report db " 2.Anker PowerCore 10,000mAh		     RM ","$"
-    product3_report db " 3.Mi Band 4		                     RM ","$"
-    product4_report db " 4.Spigen Liquid Air Armor Phone Case    RM ","$"
-    product5_report db " 5.Google Chromecast                     RM ","$"
-    total_attempt_report db " Number of attempt: ","$"
+    single_line db "------------------------------------------------------",'$'
+    summary_title_report db "            LGY POS System Summary Report",'$'
+    total_sales_report db " Total sales               : RM ",'$'
+    total_discount_report db " Total discount            : RM ",'$'
+    items_sales_report db " Product Sales:",'$'
+    product1_report db " Xiaomi Redmi Airdots                  RM ",'$'
+    product2_report db " Anker PowerCore 10,000mAh             RM ",'$'
+    product3_report db " Mi Band 4                             RM ",'$'
+    product4_report db " Spigen Liquid Air Armor Phone Case    RM ",'$'
+    product5_report db " Google Chromecast                     RM ",'$'
+    space2 db "  ",'$'
+    total_attempt_report db " Number of attempt: ",'$'
+    qty1_report db ?
+    qty2_report db ?
+    qty3_report db ?
+    qty4_report db ?
+    qty5_report db ?
+    total_item1_report dw ?
+    total_item2_report dw ?
+    total_item3_report dw ?
+    total_item4_report dw ?
+    total_item5_report dw ?
+    subtotal_report dw ?
+    total_promotion_whole dw ?
+    total_promotion_decimal dw ?
 
     ;variable for ending message
     thank_you_end db "       Thank you for using our LGY POS System!","$"
@@ -59,30 +73,43 @@
 	product4 db "4.Spigen Liquid Air Armor Phone Case    RM 39 $"
 	product5 db "5.Google Chromecast                     RM149 $"
 	str2 db "Sales Order No : $"
-	varSales db ?
 	str3 db "Quantity : $"
-	varQty db ?
-	str4 db "Press any key to continue adding order. (N=No) : $"
-	varAdd db ?
+	qty1 db ?
+    qty2 db ?
+    qty3 db ?
+    qty4 db ?
+    qty5 db ?
+    total_item1 dw ?
+    total_item2 dw ?
+    total_item3 dw ?
+    total_item4 dw ?
+    total_item5 dw ?
+	str4 db "Press Y to continue adding item. (N=No) : $"
 	errorMsg db "Invalid input. Please try again !$"
-	price1  	dw 6500
-	price2  	dw 9900
-	price3  	dw 8500
-	price4  	dw 3900
-	price5  	dw 14900
+	price1  dw 6500
+	price2  dw 9900
+	price3  dw 8500
+	price4	dw 3900
+	price5	dw 14900
 
     ;variable for calculateBalance
     cash dw ?
 	subtotal dw ?
 	balance dw ?
-	message db "Your balance is: RM ", "$" 
-	message2 db "Your remaining amount is:RM ","$"
-	message3 db "Payment successfully ! ", "$"
+    remaining dw ?
+    ask_for_payment db "Payment amount: RM ",'$'
+    payment label byte
+    maxPayment db 9
+    actualPayment db ?
+    inputPayment db 9 dup ('$')
+	message db "Your balance is: RM ",'$' 
+	message2 db "Your remaining amount is:RM ",'$'
+	message3 db "Payment successfully ! ",'$'
 
     ;variable for register and login
     fileHandler dw ?
 	File 			db "text.txt",0
-	buffer 			db 100 dup (?)
+	buffer 			db 150 dup (?)
 	openErrorMsg 		db "Error occured when opening file$"
 	readErrorMsg 		db "Error occured when reading file$"
 	writeErrorMsg		db "Error occured when writing file$"
@@ -90,9 +117,12 @@
 	newline 		db 0dh,0ah,"$"
 	usrnamePrompt 		db 0dh,0ah,20h,01h,20h,"Enter username -> $"
 	newNamePrompt 		db 0dh,0ah,20h,01h,20h,"Enter New User Name -> $"
-	usrErrorMsg     	db 0dh,0ah,"Incorrect username. Please try again. :)",'$'
-	pwdErrorMsg     	db 0dh,0ah,"Incorrect password. Please try again. :)",'$'
+	usrErrorMsg     	db 0dh,0ah,"Incorrect username. You can try ",'$'
+	pwdErrorMsg     	db 0dh,0ah,"Incorrect password. You can try ",'$'
+	time			db " more time(s). ",0dh,0ah,"$"
+	try			db 33h
 	successMsg      	db 0dh,0ah,"You have logged in successfully.",'$'
+	exitPrompt		db 0dh,0ah,"Do you want to exit the system ? (Press any key to exit) -> $"
 	exitMsg         	db 0dh,0ah,"Exiting the program... Hope to see you again!!",'$'
 	pwdPrompt       	db 0dh,0ah,20h,01h,20h,"Enter password -> $"
 	newPwdPrompt    	db 0dh,0ah,20h,01h,20h,"Enter New User Password (12 alphanumeric)-> $"
@@ -106,6 +136,9 @@
 	correctRegister		db 0h
 	registerSuccessMsg	db 0dh,0ah,"You have registered new user successfully.",'$'
 	registerData		db 30 dup (?)
+	logoutPrompt		db 0dh,0ah,"Do you want to log out the system ? -> $"
+	logoutMsg		db 0dh,0ah,"You have logged out successfully! $"
+	error			db 0dh,0ah,"Invalid input.",0dh,0ah,"Please try again:)$"
 	welcomeLogo		db "*     *     *  ******   *       ******  *******    *       *   ****** ",0dh,0ah
 				db " *   * *   *   *        *       *       *     *    **     **   *",0dh,0ah
 				db " * *   *  *    ******   *       *       *     *    * *   * *   ******",0dh,0ah
@@ -124,6 +157,15 @@
 				db "  '----------------'   '----------------'   '----------------' ",0dh,0ah,0dh,0ah
 				db " **************************************************************",0dh,0ah,"$"
 
+    ;variable for main manu
+    main_page   db " ------------------------------------ ",0dh,0ah
+                db " |                                  | ",0dh,0ah
+                db " |          1. Order Menu           | ",0dh,0ah
+                db " |          2. Logout               | ",0dh,0ah
+                db " |                                  | ",0dh,0ah
+                db " ------------------------------------ ",0dh,0ah,0dh,0ah
+                db " Choice:",'$'
+
 
 .code
 
@@ -135,12 +177,13 @@ main proc
     jmp skipcode
 login_proc:
 
-    mov ah,09h
+    call clearScreen
+	mov ah,09h
 	lea dx,newline
 	int 21h
 	lea dx,welcomeLogo
 	int 21h
-
+	
     openFile:
 	mov ah,3dh		;function 3dh - open file
 	mov al,2	;010b	;access mode - read/write
@@ -153,20 +196,12 @@ login_proc:
 	;read file
 	mov ah,3fh		;function 3fh - read file
 	mov bx,fileHandler	;ready handler
-	mov cx,100		;read 100 bytes in file
+	mov cx,150		;read 150 bytes in file
 	lea dx,buffer		;ready buffer
 	int 21h
 	jmp inpUsername
 
 	jc readError		;when error, cf=1
-
-    closeFile:
-	;close file
-	mov bx,fileHandler	;ready handler
-	mov ah,3eh		;function 3eh - close file
-	int 21h
-	mov ah,4ch
-	int 21h
 
     openError:
 	mov ah,09h
@@ -184,6 +219,7 @@ login_proc:
 	mov al,02h		;error level=2
 	int 21h
 
+    ;input username, if correctRegister=1->input registerUsername
     inpUsername:
 	mov al,correctRegister
 	cmp al,1
@@ -196,6 +232,7 @@ login_proc:
 	mov di,si
 	jmp inputLoop
 
+    ;prompt input new user
     newUser:
 	mov ah,09h
 	lea dx,newNamePrompt
@@ -204,6 +241,7 @@ login_proc:
 	mov di,si
 	jmp inputLoop
 
+    ;input string using char by char
     inputLoop:
 	;input
 	mov ah, 01h
@@ -214,11 +252,13 @@ login_proc:
 	je handleUsrBackspace
 	jne saveInput
 
+    ;save input to username variable
     saveInput:
 	mov [si],al
 	inc si
 	jmp inputLoop
 
+    ;check user entered backspace
     handleUsrBackspace:
 	mov ah,02h
 	mov dl,' '
@@ -232,6 +272,7 @@ login_proc:
 	inc cx
 	jmp inputLoop	
 
+    ;add symbol to variable,$ to end string
     inputDone:
 	mov al,'*'
 	mov [si],al
@@ -246,11 +287,12 @@ login_proc:
 	lea di, buffer
 	jmp checkCharacter
 
+    ;prompt registerPassword
     newPassword:
 	mov ah,09h
 	lea dx,newPwdPrompt
 	int 21h
-	mov cx,12
+	mov cx,12	;password=12alphanumeric
 	lea si,registerPass
 	mov di,si
 	jmp newPass
@@ -267,6 +309,7 @@ login_proc:
         dec cx
 	jmp newPass
 
+    ;add symbol to end string
     endPass:
 	mov al,'#'
 	mov [si],al
@@ -285,10 +328,10 @@ login_proc:
 	int 21h
 
 	dec si
-	dec di
 	inc cx
 	jmp newPass
 
+    ;save register data such as username and password
     registerProcess:
 	mov al,[si]
 	mov [di],al
@@ -312,6 +355,7 @@ login_proc:
 	inc di
 	jmp savePass
 
+    ;eliminate null to store in textfile
     eliminateNull:
 	inc di
 	mov al,'$'
@@ -320,6 +364,7 @@ login_proc:
 	lea si,registerData
 	jmp countStringLength
 	
+    ;count length of string to store in textfile
     countStringLength:
 	mov al,[si]
 	cmp al,'$'
@@ -336,17 +381,67 @@ login_proc:
 	jc WriteError 		; jump if there is an error
 	cmp ax,cx 		; was all the data written?
 	jne WriteError 		; no it wasn't - error!
-
 	mov ah,09h
 	lea dx,registerSuccessMsg
 	int 21h
-	jmp closeFile
+    jmp continue_logoutPrompt
+
+    continue_login_proc_2:
+    jmp login_proc
+
+    continue_logoutPrompt:
+    logout:
+	lea dx,logoutPrompt
+	int 21h
+	mov ah,01h
+	int 21h
+	cmp al,'Y'
+	je logoutSuccess
+	cmp al,'y'
+	je logoutSuccess	;if no,jump menu?
+	jmp invalidLoginInput
+
+    logoutSuccess:
+	mov ah,09h
+	lea dx,logoutMsg
+	int 21h
+	jmp inputExit
+
+    invalidLoginInput:
+	mov ah,09h
+	lea dx,error
+	int 21h
+	jmp logout
+
+    inputExit:
+	mov ah,09h
+	lea dx,exitPrompt
+	int 21h
+	mov ah,01h
+	int 21h
+	cmp al,'N'
+	je closeFile
+	cmp al,'n'
+	je closeFile
+	cmp al,'Y'
+	mov ah,4ch
+	int 21h
+	cmp al,'y'
+	mov ah,4ch
+	int 21h
 
     WriteError:
 	mov ah,09h
 	lea dx,writeErrorMsg
 	int 21h
 	jmp exitProgram
+
+    closeFile:
+	;close file
+	mov bx,fileHandler	;ready handler
+	mov ah,3eh		;function 3eh - close file
+	int 21h
+	jmp login_proc
 
     checkCharacter:
 	mov al,[di]
@@ -355,7 +450,7 @@ login_proc:
 	mov al,[si]
 	cmp al,[di]
 	je nextChar
-	mov cx,100
+	mov cx,150
 	jne nextID
 
     nextID:
@@ -462,6 +557,9 @@ login_proc:
 	je nextPass
 	jne incorrectPass
 
+    continue_login_proc:
+    jmp continue_login_proc_2
+
     successLogin:
 	call clearScreen
 	mov ah,09h
@@ -489,18 +587,93 @@ login_proc:
 	jmp checkPassword
 
     incorrectPass:
+	mov al,try
+	cmp al,30h
 	mov ah,09h
 	lea dx,pwdErrorMsg
 	int 21h
+	mov ah,02h
+	mov dl,try
+	int 21h
+	mov ah,09h
+	lea dx,time
+	int 21h
+	dec try
 	jmp inpPassword
 
+    je continue_exitProgram
+
+
 skipcode:
-
 menu_proc:
+    mov ah,09h
+    lea dx,main_page
+    int 21h
+    mov ah,01h
+    int 21h
+    mov choice,al
+    call n_line
 
-    call menu
-    call calculatePriceAfterTax
-    call printOutput
+    ;check choice
+    cmp [choice],'1'
+    je start_menu
+    cmp [choice],'2'
+    je continue_login_proc
+    mov ah,09h
+    lea dx,errorMsg
+    int 21h
+
+start_menu:
+    call clearScreen
+    call order_menu
+    call clearScreen
+
+receipt_proc:
+    call receipt
+    call n_line
+    ;call balanceProc
+    inc [total_attempt]
+
+    check_another_order:
+    ;check for another order
+    xor ax,ax
+    mov ah,09h
+    lea dx,another_order
+    int 21h
+    mov ah,01h
+    int 21h
+    mov bl,al
+    cmp bl,'n'
+    call clearScreen
+    je menu_proc
+    cmp bl,'N'
+    call clearScreen
+    je menu_proc
+    cmp bl,'y'
+    call clearScreen
+    je start_menu
+    cmp bl,'Y'
+    call clearScreen
+    je start_menu
+    jmp continue_display_error_message
+
+    continue_exitProgram:
+    jmp exitProgram
+
+    continue_display_error_message:
+    ;display error message
+    xor ax,ax
+    call n_line
+    mov ah,09h
+    lea dx,errorMsg
+    int 21h
+    call n_line
+    jmp check_another_order
+
+
+report_proc:
+    call clearScreen
+    call report
 
 exitProgram:
 	mov ah,09h
@@ -511,7 +684,7 @@ exitProgram:
 
 main endp
 
-menu proc
+order_menu proc
 
     jmp show_menu
 
@@ -526,66 +699,77 @@ input_loop:
 	int 21h
 	mov bl,al
 
+compare1:
     ;Check user's input
-    	cmp bl, '1'
+    cmp bl, '1'
 	jne compare2
 
 	;product1
 	mov ah, 09h
-    	lea dx, newline
-    	int 21h
-    	lea dx, str3
-    	int 21h
+    lea dx, newline
+    int 21h
+    lea dx, str3
+    int 21h
 
-    	; Input for quantity
-    	mov ah, 01h
-    	int 21h
+    ; Input for quantity
+    mov ah, 01h
+    int 21h
 
-    	sub al, 30h
-    	mov bl, al  ; Store the numeric quantity in BL
+    sub al, 30h
+    mov bl, al   ; Store the numeric quantity in BL
+    add qty1,al
+    add qty1_report,al ; Store qty product 1 in variable
 
-    	; Move the price1 to AX
-    	mov ax, price1
+    ; Move the price1 to AX
+    mov ax, price1
 
-    	; Multiply AX by BL (quantity)
-        xor dx,dx
-    	mul bx
+    ; Multiply AX by BL (quantity)
+    xor dx,dx
+    mul bx
 
-    	; Add the result to sum
-    	add subtotal, ax
+    ; Add the result to sum
+    add total_item1, ax ; Store price for each item
+    add total_item1_report,ax
+    add subtotal, ax
+    add subtotal_report, ax
 
-    	; Ask if the user wants to continue
-    	jmp ask_to_continue
+    ; Ask if the user wants to continue
+    jmp ask_to_continue
 
 compare2:
-    	cmp bl, '2'
+    cmp bl, '2'
 	jne compare3
 
 	;product2
 	mov ah, 09h
-    	lea dx, newline
-    	int 21h
-    	lea dx, str3
-    	int 21h
+    lea dx, newline
+    int 21h
+    lea dx, str3
+    int 21h
 
-    	; Input for quantity
-    	mov ah, 01h
-    	int 21h
+    ; Input for quantity
+    mov ah, 01h
+    int 21h
 
-    	sub al, 30h
-    	mov bl, al  ; Store the numeric quantity in BL
+    sub al, 30h
+    mov bl, al  ; Store the numeric quantity in BL
+    add qty2,al ; Store qty product 2 in variable
+    add qty2_report,al
 
-    	; Move the price2 to AX
-    	mov ax, price2
+    ; Move the price2 to AX
+    mov ax, price2
 
-    	; Multiply AX by BL (quantity)
-    	mul bx
+    ; Multiply AX by BL (quantity)
+    mul bx
 
-    	; Add the result to sum
-    	add subtotal, ax
+    ; Add the result to sum
+    add subtotal, ax
+    add subtotal_report, ax
+    add total_item2, ax ; Store price for each item
+    add total_item2_report,ax
 
-    	; Ask if the user wants to continue
-    	jmp ask_to_continue
+    ; Ask if the user wants to continue
+    jmp ask_to_continue
 
 compare3:
 	cmp bl, '3'
@@ -603,22 +787,27 @@ compare3:
 	int 21h
 
 	sub al, 30h
-    	mov bl, al  ; Store the numeric quantity in BL
+    mov bl, al  ; Store the numeric quantity in BL
+    add qty3,al ; Store qty product 3 in variable
+    add qty3_report,al
 
-    	; Move the price3 to AX
-    	mov ax, price3
+    ; Move the price3 to AX
+    mov ax, price3
 
-    	; Multiply AX by BL (quantity)
-    	mul bx
+    ; Multiply AX by BL (quantity)
+    mul bx
 
-    	; Add the result to sum
-    	add subtotal, ax
+    ; Add the result to sum
+    add subtotal, ax
+    add subtotal_report, ax
+    add total_item3, ax ; Store price for each item
+    add total_item3_report,ax
 
-    	;Ask if the user wants to continue
-    	jmp ask_to_continue
+    ;Ask if the user wants to continue
+    jmp ask_to_continue
 
 compare4:
-    	cmp bl, '4'
+    cmp bl, '4'
 	jne compare5
 	
 	;product4
@@ -633,23 +822,28 @@ compare4:
 	int 21h
 
 	sub al, 30h
-    	mov bl, al  ; Store the numeric quantity in BL
+    mov bl, al  ; Store the numeric quantity in BL
+    add qty4,al ; Store qty product 4 in variable
+    add qty4_report,al
 
-    	; Move the price4 to AX
-    	mov ax, price4
+    ; Move the price4 to AX
+    mov ax, price4
 
-    	; Multiply AX by BL (quantity)
-    	mul bx
+    ; Multiply AX by BL (quantity)
+    mul bx
 
-    	; Add the result to sum
-    	add subtotal, ax
+    ; Add the result to sum
+    add subtotal, ax
+    add subtotal_report, ax
+    add total_item4, ax ; Store price for each item
+    add total_item4_report,ax
 
-    	;Ask if the user wants to continue
-    	jmp ask_to_continue
+    ;Ask if the user wants to continue
+    jmp ask_to_continue
 
 compare5:
 	cmp bl, '5'
- 	jne invalidInput
+ 	jne invalidInput_sales
 
 	;product5
 	mov ah,09h
@@ -663,54 +857,70 @@ compare5:
 	int 21h
 
 	sub al, 30h
-    	mov bl, al  ; Store the numeric quantity in BL
+    mov bl, al  ; Store the numeric quantity in BL
+    add qty5,al ; Store qty product 5 in variable
+    add qty5_report,al
 
-    	; Move the price5 to AX
-    	mov ax, price5
+    ; Move the price5 to AX
+    mov ax, price5
 
-    	; Multiply AX by BL (quantity)
-    	mul bx
+    ; Multiply AX by BL (quantity)
+    mul bx
 
-    	; Add the result to sum
-    	add subtotal, ax
+    ; Add the result to sum
+    add subtotal, ax
+    add subtotal_report, ax
+    add total_item5, ax ; Store price for each item
+    add total_item5_report,ax
 
-    	;Ask if the user wants to continue
-    	jmp ask_to_continue
+    ;Ask if the user wants to continue
+    jmp ask_to_continue
 
-
-invalidInput:
+invalidInput_sales:
     ;Invalid input, inform the user and ask again
-    	mov ah, 09h
-    	lea dx, newline
-    	int 21h
-    	lea dx, errorMsg
-    	int 21h
-	    lea dx,newline
-	    int 21h
-    	jmp input_loop
-
-ask_to_continue:
     mov ah, 09h
+    lea dx, newline
+    int 21h
+    lea dx, errorMsg
+    int 21h
 	lea dx,newline
 	int 21h
+    jmp input_loop
+
+invalidInput_confirm:
+    mov ah,09h
+    lea dx, newline
+    int 21h
+    lea dx, errorMsg
+    int 21h
+    lea dx,newline
+	int 21h
+
+ask_to_continue:
+    mov ah,09h
+    lea dx,newline
+    int 21h
    	lea dx, str4
    	int 21h
 
     ;Input
-    	mov ah, 01h
-    	int 21h
+    mov ah, 01h
+    int 21h
 
     ;Check user's input
-    	cmp al, 'N'
-    	je end_program
-    	cmp al, 'n'
-    	je end_program
+    cmp al, 'N'
+    je continue_end_program
+    cmp al, 'n'
+    je continue_end_program
 
-    ;If 'Y' or 'y' or invalid input, show the menu again
-        mov ah, 09h
-        lea dx,newline
-        int 21h
-    	jmp show_menu
+    ;If 'Y' or 'y', show the menu again
+    cmp al, 'Y'
+    je show_menu
+    cmp al, 'y'
+    je show_menu
+
+    ;If invalid input, show invalid message and ask for input
+    jmp invalidInput_confirm
 
 show_menu:
 	mov ah,09h
@@ -730,6 +940,12 @@ show_menu:
 	int 21h
 	lea dx,product2
 	int 21h
+    jmp continue_show_menu
+
+continue_end_program:
+    jmp end_program
+
+continue_show_menu:
 	lea dx,newline
 	int 21h
 	lea dx,product3
@@ -753,21 +969,23 @@ show_menu:
 end_program:
 	ret
 
-menu endp
+order_menu endp
 
 calculatePromotion proc
 
-    ;clear dx
-    xor dx,dx
+    mov ax,subtotal
+
+    ;compare subtotal
+    cmp ax,30000
+    jb endPromotion
 
     ;separate decimal
-    mov ax,subtotal
     mov bx,100
     div bx
 
     ;store whole and decimal
     mov whole_number,ax
-    mov decimal_number,dl
+    mov decimal_number,dx
 
     ;whole number
 	;mov data to registers
@@ -775,61 +993,56 @@ calculatePromotion proc
     xor ax,ax
 	mov ax,whole_number
 
-    ;compare subtotal
-    cmp ax,300
-    jl endPromotion
-
-    ;div 100 to separate ax,dx
-    mov bx,100
-    div bx
-
-    ;store ax,dx into variable
-    mov num_12_whole,dl
-    mov num_34_whole,ax
-    
-    ;check dx
-    cmp [num_12_whole],0
-    jg calc_12_whole_promotion
-    jmp calc_34_whole_promotion
-
-calc_12_whole_promotion:
-    ;calc 5% discount for 1,2 digits
-    xor dx,dx
-    mov al,num_12_whole
-    mov bl,5
-    mul bl
-    mov bx,100
-    div bx
-    mov result_12,dx
-    mov result_extra,al
-
-    ;multiply result_12 with 100
-    xor ax,ax
-    mov ax,result_12
-    mov bx,100
-    mul bx
-    mov result_12,ax
-
-calc_34_whole_promotion:
-    ;calc 5% discount for 3,4 digits
-    xor dx,dx
-    mov ax,num_34_whole
+    ;calc 5% for whole number
     mov bx,5
     mul bx
-    add al,result_extra
-    mov result_34,ax
+    mov bx,100
+    div bx
+    mov whole_number,ax
+    mov whole_number_remainder,dx
 
-calc_12_decimal_promotion:
+    ;multiply whole_number_remainder with 100
+    xor ax,ax
+    mov ax,whole_number_remainder
+    mul bx
+    mov whole_number_remainder,ax
+
     ;calc 5% discount for decimal
     xor ax,ax
     xor dx,dx
-    mov al,decimal_number
+    mov ax,decimal_number
     mov bl,5
     mul bl
-    add ax,result_12
-    mov result_12,ax
+    add ax,whole_number_remainder
+    mov decimal_number,ax
+
+    ;check if decimal exceed 10000
+    cmp [decimal_number],10000
+    jge round_up_decimal_promotion
+    jmp calculate_total_promotion
+
+round_up_decimal_promotion:
+    mov ax,decimal_number
+    mov bx,10000
+    div bx
+    add whole_number,ax
+    mov dx,decimal_number
+    jmp endPromotion
+
+calculate_total_promotion:
+    xor dx,dx
+    mov ax,whole_number
+    add total_promotion_whole,ax
+    mov ax,decimal_number
+    add total_promotion_decimal,ax
+
+    ;check if decimal exceed 10000
+    cmp [total_promotion_decimal],10000
+    jge round_up_decimal_promotion
 
 endPromotion:
+    xor ax,ax
+    xor dx,dx
     ret
 
 calculatePromotion endp
@@ -837,55 +1050,74 @@ calculatePromotion endp
 printOutput proc
 
     ;print price
-    ;separate result_34
+    ;separate result_whole
     xor dx,dx
     xor ax,ax
-    mov ax,result_34
+    mov ax,whole_number
     mov bx,10
     div bx
-    mov result_remainder_34,dl
+    mov result_whole_single,dl
     
-    ;check if al more than 9
-    cmp al,10
+    ;check al condition
+    cmp ax,100
     jge thou_place
-    mov result_remainder_34_extra,10
-    mov result_quotient_34,al
-    jmp continue_print_34
+    cmp ax,10
+    jge hund_place
+    cmp ax,0
+    je print_whole_single
+    mov result_whole_tens,al
+    jmp print_whole_tens
 
 thou_place:
     xor dx,dx
     div bx
-    mov result_remainder_34_extra,dl
-    mov result_quotient_34,al
+    mov result_whole_tens,dl
+    xor dx,dx
+    div bx
+    mov result_whole_hund,dl
+    mov result_whole_thou,al
+    jmp print_whole_thou
 
-continue_print_34:
 
-    ;check if result_quotient_34 is 0
-    cmp result_quotient_34,0
-    je end_continue_print_34
+hund_place:
+    xor dx,dx
+    div bx
+    mov result_whole_tens,dl
+    mov result_whole_hund,al
+    jmp print_whole_hund
 
-    ;print first number
+print_whole_thou:
+
+    ;print thou number
     xor ax,ax
     xor dx,dx
-    mov dl,result_quotient_34
+    mov dl,result_whole_thou
     add dl,30h
     mov ah,02h
     int 21h
 
-end_continue_print_34:
-    ;check value of result_remainder_34_extra
-    cmp result_remainder_34_extra,10
-    jl print_result_remainder_34_extra
-    jmp print_result_remainder_34
+print_whole_hund:
 
-print_result_remainder_34_extra:
-    mov dl,result_remainder_34_extra
+    ;print hund number
+    xor ax,ax
+    xor dx,dx
+    mov dl,result_whole_hund
     add dl,30h
     mov ah,02h
     int 21h
 
-print_result_remainder_34:
-    mov dl,result_remainder_34
+print_whole_tens:
+
+    ;print tens number
+    mov dl,result_whole_tens
+    add dl,30h
+    mov ah,02h
+    int 21h
+
+print_whole_single:
+
+    ;print single number
+    mov dl,result_whole_single
     add dl,30h
     mov ah,02h
     int 21h
@@ -897,64 +1129,59 @@ print_result_remainder_34:
     int 21h
 
     ;separate deci_result
+    ;get decimal_single
     xor dx,dx
     xor ax,ax
-    mov ax,result_12
-    mov bx,100
-    div bx
-    mov result_quotient_12,al
-    mov result_remainder_12,dl
-
-    ;separate result_quotient
-    xor dx,dx
-    xor ax,ax
-    mov al,result_quotient_12
+    mov ax,decimal_number
     mov bl,10
-    div bl
+    div bx
+    mov result_decimal_single,dl
+    mov result_decimal_remain,ax
 
-    ;store
-    mov result_quotient_num1,al
-    mov result_quotient_num2,ah
+    ;get decimal_tens
+    xor dx,dx
+    div bx
+    mov result_decimal_tens,dl
+    mov result_decimal_remain,ax
+
+    ;get decimal_thou and hund
+    xor dx,dx
+    div bl
+    mov result_decimal_hund,ah
+    mov result_decimal_thou,al
 
     ;print first number
     xor ax,ax
-    mov dl,result_quotient_num1
+    mov dl,result_decimal_thou
     add dl,30h
     mov ah,02h
     int 21h
 
     ;print second number
     xor ax,ax
-    mov dl,result_quotient_num2
+    mov dl,result_decimal_hund
     add dl,30h
     mov ah,02h
     int 21h
 
-    ;separate result_remainder
-    xor dx,dx
-    xor ax,ax
-    mov al,result_remainder_12
-    mov bl,10
-    div bl
-    mov result_remainder_num1,al
-    mov result_remainder_num2,ah
-
     ;print third number
     xor ax,ax
-    mov dl,result_remainder_num1
+    mov dl,result_decimal_tens
     add dl,30h
     mov ah,02h
     int 21h
 
     ;print forth number
     xor ax,ax
-    mov dl,result_remainder_num2
+    mov dl,result_decimal_single
     add dl,30h
     mov ah,02h
     int 21h
 
-    ;print n_line
-    call n_line
+    ;clear whole_number and decimal_number
+    xor ax,ax
+    mov whole_number,ax
+    mov decimal_number,ax
 
     ret
 
@@ -962,17 +1189,19 @@ printOutput endp
 
 calculateDiscountedPrice proc
 
-    ;clear dx
-    xor dx,dx
+    mov ax,subtotal
+
+    ;compare subtotal
+    cmp ax,30000
+    jb endDiscounted
 
     ;separate decimal
-    mov ax,subtotal
     mov bx,100
     div bx
 
     ;store whole and decimal
     mov whole_number,ax
-    mov decimal_number,dl
+    mov decimal_number,dx
 
     ;whole number
 	;mov data to registers
@@ -980,85 +1209,50 @@ calculateDiscountedPrice proc
     xor ax,ax
 	mov ax,whole_number
 
-    ;compare subtotal
-    cmp ax,300
-    jl endDiscounted
-
-    ;div 100 to separate ax,dx
-    mov bx,100
-    div bx
-
-    ;store ax,dx into variable
-    mov num_12_whole,dl
-    mov num_34_whole,ax
-    
-    ;check dx
-    cmp [num_12_whole],0
-    jg calc_12_whole_discounted
-    jmp calc_34_whole_discounted
-
-calc_12_whole_discounted:
-    ;calc 95% for 1,2 digits
-    xor dx,dx
-    mov al,num_12_whole
-    mov bl,95
-    mul bl
-    mov bx,100
-    div bx
-    mov result_12,dx
-    mov result_extra,al
-
-    ;multiply result_12 with 100
-    xor ax,ax
-    mov ax,result_12
-    mov bx,100
-    mul bx
-    mov result_12,ax
-
-calc_34_whole_discounted:
-    ;calc 95% discount for 3,4 digits
-    xor dx,dx
-    mov ax,num_34_whole
+    ;calc 95% for whole number
     mov bx,95
     mul bx
-    add al,result_extra
-    mov result_34,ax
+    mov bx,100
+    div bx
+    mov whole_number,ax
+    mov whole_number_remainder,dx
 
-calc_12_decimal_discounted:
+    ;multiply whole_number_remainder with 100
+    xor ax,ax
+    mov ax,whole_number_remainder
+    mul bx
+    mov whole_number_remainder,ax
+
     ;calc 95% discount for decimal
     xor ax,ax
     xor dx,dx
-    mov al,decimal_number
+    mov ax,decimal_number
     mov bl,95
     mul bl
-    add ax,result_12
-    mov result_12,ax
+    add ax,whole_number_remainder
+    mov decimal_number,ax
 
-    ;check result_12 value
-    cmp [result_12],10000
-    jge extra_calc_decimal_discounted
+    ;check if decimal exceed 10000
+    cmp [decimal_number],10000
+    jge round_up_decimal_discounted
     jmp endDiscounted
 
-extra_calc_decimal_discounted:
-    xor ax,ax
-    xor dx,dx
-    mov ax,result_12
+round_up_decimal_discounted:
+    mov ax,decimal_number
     mov bx,10000
     div bx
-    add ax,result_34
-    mov result_12,dx
-    mov result_34,ax
+    add whole_number,ax
+    mov decimal_number,dx
 
 endDiscounted:
+    xor ax,ax
+    xor dx,dx
     ret
 
 calculateDiscountedPrice endp
 
 calculateTax proc
 
-    ;clear dx
-    xor dx,dx
-
     ;separate decimal
     mov ax,subtotal
     mov bx,100
@@ -1066,7 +1260,7 @@ calculateTax proc
 
     ;store whole and decimal
     mov whole_number,ax
-    mov decimal_number,dl
+    mov decimal_number,dx
 
     ;whole number
 	;mov data to registers
@@ -1074,55 +1268,44 @@ calculateTax proc
     xor ax,ax
 	mov ax,whole_number
 
-    ;div 100 to separate ax,dx
-    mov bx,100
-    div bx
-
-    ;store ax,dx into variable
-    mov num_12_whole,dl
-    mov num_34_whole,ax
-    
-    ;check dx
-    cmp [num_12_whole],0
-    jg calc_12_whole_tax
-    jmp calc_34_whole_tax
-
-calc_12_whole_tax:
-    ;calc 6% for 1,2 digits
-    xor dx,dx
-    mov al,num_12_whole
-    mov bl,6
-    mul bl
-    mov bx,100
-    div bx
-    mov result_12,dx
-    mov result_extra,al
-
-    ;multiply result_12 with 100
-    xor ax,ax
-    mov ax,result_12
-    mov bx,100
-    mul bx
-    mov result_12,ax
-
-calc_34_whole_tax:
-    ;calc 6% discount for 3,4 digits
-    xor dx,dx
-    mov ax,num_34_whole
+    ;calc 6% for whole number
     mov bx,6
     mul bx
-    add al,result_extra
-    mov result_34,ax
+    mov bx,100
+    div bx
+    mov whole_number,ax
+    mov whole_number_remainder,dx
 
-calc_12_decimal_tax:
+    ;multiply whole_number_remainder with 100
+    xor ax,ax
+    mov ax,whole_number_remainder
+    mul bx
+    mov whole_number_remainder,ax
+
     ;calc 6% discount for decimal
     xor ax,ax
     xor dx,dx
-    mov al,decimal_number
+    mov ax,decimal_number
     mov bl,6
     mul bl
-    add ax,result_12
-    mov result_12,ax
+    add ax,whole_number_remainder
+    mov decimal_number,ax
+
+    ;check if decimal exceed 10000
+    cmp [decimal_number],10000
+    jge round_up_decimal_tax
+    jmp endTax
+
+round_up_decimal_tax:
+    mov ax,decimal_number
+    mov bx,10000
+    div bx
+    add whole_number,ax
+    mov decimal_number,dx
+
+endTax:
+    xor ax,ax
+    xor dx,dx
 
     ret
 
@@ -1130,9 +1313,6 @@ calculateTax endp
 
 calculatePriceAfterTax proc
 
-    ;clear dx
-    xor dx,dx
-
     ;separate decimal
     mov ax,subtotal
     mov bx,100
@@ -1140,7 +1320,7 @@ calculatePriceAfterTax proc
 
     ;store whole and decimal
     mov whole_number,ax
-    mov decimal_number,dl
+    mov decimal_number,dx
 
     ;whole number
 	;mov data to registers
@@ -1148,78 +1328,69 @@ calculatePriceAfterTax proc
     xor ax,ax
 	mov ax,whole_number
 
-    ;div 100 to separate ax,dx
+    ;calc 106% for whole number
+    mov bx,106
+    mul bx
     mov bx,100
     div bx
+    mov whole_number,ax
+    mov whole_number_remainder,dx
 
-    ;store ax,dx into variable
-    mov num_12_whole,dl
-    mov num_34_whole,ax
-    
-    ;check dx
-    cmp [num_12_whole],0
-    jg calc_12_whole_payment
-    jmp calc_34_whole_payment
-
-calc_12_whole_payment:
-    ;calc 94% for 1,2 digits
-    xor dx,dx
-    mov al,num_12_whole
-    mov bl,94
-    mul bl
-    mov bx,100
-    div bx
-    mov result_12,dx
-    mov result_extra,al
-
-    ;multiply result_12 with 100
+    ;multiply whole_number_remainder with 100
     xor ax,ax
-    mov ax,result_12
-    mov bx,100
+    mov ax,whole_number_remainder
     mul bx
-    mov result_12,ax
+    mov whole_number_remainder,ax
 
-calc_34_whole_payment:
-    ;calc 94% discount for 3,4 digits
-    xor dx,dx
-    mov ax,num_34_whole
-    mov bx,94
-    mul bx
-    add al,result_extra
-    mov result_34,ax
-
-calc_12_decimal_payment:
-    ;calc 94% discount for decimal
+    ;calc 106% discount for decimal
     xor ax,ax
     xor dx,dx
-    mov al,decimal_number
-    mov bl,94
+    mov ax,decimal_number
+    mov bl,106
     mul bl
-    add ax,result_12
-    mov result_12,ax
+    add ax,whole_number_remainder
+    mov decimal_number,ax
 
-    ;check result_12 value
-    cmp [result_12],10000
-    jge extra_calc_decimal_tax
-    jmp endTax
+    ;check if decimal exceed 10000
+    cmp [decimal_number],10000
+    jge round_up_decimal_afterTax
+    jmp endAfterTax
 
-extra_calc_decimal_tax:
-    xor ax,ax
-    xor dx,dx
-    mov ax,result_12
+round_up_decimal_afterTax:
+    mov ax,decimal_number
     mov bx,10000
     div bx
-    add ax,result_34
-    mov result_12,dx
-    mov result_34,ax
+    add whole_number,ax
+    mov decimal_number,dx
 
-endTax:
+endAfterTax:
+    xor ax,ax
+    xor dx,dx
     ret
 
 calculatePriceAfterTax endp
 
 balanceProc proc
 
+    mov ah,09h
+    lea dx,ask_for_payment
+    int 21h
+    xor ax,ax
+    xor dx,dx
+    ;get input string
+    mov ah,0ah
+    lea dx,payment
+    int 21h
+    lea dx,payment+2
+    mov bx,dx
+    mov bl,[bx-1]
+    mov bh,0
+    add bx,dx
+    mov byte [bx],"$"
+    mov ah,09h
+    int 21h
+
+    mov cash,ax
     mov ax,cash
 	mov bx,subtotal
 
@@ -1231,63 +1402,6 @@ balanceProc proc
 calculate_balance:
     sub ax,bx   ; Calculate balance (cashReceive - subtotal)
     mov balance,ax
-
-    ;clear dx
-    xor dx,dx
-
-    ;mov balance to register
-    mov ax,balance
-
-    ;store whole and decimal
-    mov whole_number,ax
-    mov decimal_number,dl
-
-    ;whole number
-	;mov data to registers
-    xor dx,dx
-    xor ax,ax
-	mov ax,whole_number
-
-    ;div 100 to separate ax,dx
-    mov bx,100
-    div bx
-
-    ;store ax,dx into variable
-    mov num_12_whole,dl
-    mov num_34_whole,ax
-    
-    ;check dx
-    cmp [num_12_whole],0
-    jg calc_12_whole_balance
-    jmp calc_34_whole_balance
-
-calc_12_whole_balance:
-    xor dx,dx
-    mov al,num_12_whole
-    mov bx,100
-    div bx
-    mov result_12,dx
-    mov result_extra,al
-
-    ;multiply result_12 with 100
-    xor ax,ax
-    mov ax,result_12
-    mov bx,100
-    mul bx
-    mov result_12,ax
-
-calc_34_whole_balance:
-    xor dx,dx
-    mov ax,num_34_whole
-    add al,result_extra
-    mov result_34,ax
-
-calc_12_decimal_balance:
-    xor ax,ax
-    xor dx,dx
-    mov al,decimal_number
-    add ax,result_12
-    mov result_12,ax
     jmp display_balance
 
 continue_display_message:
@@ -1306,64 +1420,8 @@ display_balance:
 
 calculate_remaining:
 	SUB bx,ax		; Calculate remaining (subtotal - cashReceive)		
-	mov balance,bx
-
-    ;clear dx
-    xor dx,dx
-
-    ;separate decimal
-    mov ax,balance
-
-    ;store whole and decimal
-    mov whole_number,ax
-    mov decimal_number,dl
-
-    ;whole number
-	;mov data to registers
-    xor dx,dx
-    xor ax,ax
-	mov ax,whole_number
-
-    ;div 100 to separate ax,dx
-    mov bx,100
-    div bx
-
-    ;store ax,dx into variable
-    mov num_12_whole,dl
-    mov num_34_whole,ax
-    
-    ;check dx
-    cmp [num_12_whole],0
-    jg calc_12_whole_remainding
-    jmp calc_34_whole_remainding
-
-calc_12_whole_remainding:
-    xor dx,dx
-    mov al,num_12_whole
-    mov bx,100
-    div bx
-    mov result_12,dx
-    mov result_extra,al
-
-    ;multiply result_12 with 100
-    xor ax,ax
-    mov ax,result_12
-    mov bx,100
-    mul bx
-    mov result_12,ax
-
-calc_34_whole_remainding:
-    xor dx,dx
-    mov ax,num_34_whole
-    add al,result_extra
-    mov result_34,ax
-
-calc_12_decimal_remainding:
-    xor ax,ax
-    xor dx,dx
-    mov al,decimal_number
-    add ax,result_12
-    mov result_12,ax
+	mov remaining,bx
+    jmp display_remaining
 
 display_remaining:
     mov ah,09h
@@ -1408,51 +1466,145 @@ report proc
     mov ah,09h
     lea dx,total_sales_report
     int 21h
+    xor dx,dx
+    mov ax,subtotal_report
+    call printDecimalProc
+    call printOutput
     call n_line
 
     ;print total discount
     mov ah,09h
     lea dx,total_discount_report
     int 21h
+    xor dx,dx
+total_discount_proc:
+    ;mov total_whole to register
+    mov ax,total_promotion_whole
+
+    ;store whole and decimal
+    mov whole_number,ax
+
+    ;store total_decimal to register
+    mov ax,total_promotion_decimal
+    mov decimal_number,ax
+    call printOutput
     call n_line
 
     ;print n_line
     call n_line
 
-    ;print product sale
+    ;print line 
+    call line
+    call n_line
+
+    ;print category
     mov ah,09h
-    lea dx,items_sales_report
+    lea dx,category_receipt
     int 21h
+    call n_line
+
+    ;print line 
+    call line
     call n_line
 
     ;print product 1
     mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,02h
+    mov dl,qty1_report
+    add dl,30h
+    int 21h
+    mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,09h
     lea dx,product1_report
     int 21h
+    mov ax,total_item1_report
+    xor dx,dx
+    call printDecimalProc
+    call printOutput
     call n_line
 
     ;print product 2
     mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,02h
+    mov dl,qty2_report
+    add dl,30h
+    int 21h
+    mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,09h
     lea dx,product2_report
     int 21h
+    mov ax,total_item2_report
+    xor dx,dx
+    call printDecimalProc
+    call printOutput
     call n_line
 
     ;print product 3
     mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,02h
+    mov dl,qty3_report
+    add dl,30h
+    int 21h
+    mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,09h
     lea dx,product3_report
     int 21h
+    mov ax,total_item3_report
+    xor dx,dx
+    call printDecimalProc
+    call printOutput
     call n_line
 
     ;print product 4
     mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,02h
+    mov dl,qty4_report
+    add dl,30h
+    int 21h
+    mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,09h
     lea dx,product4_report
     int 21h
+    mov ax,total_item4_report
+    xor dx,dx
+    call printDecimalProc
+    call printOutput
     call n_line
 
     ;print product 5
     mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,02h
+    mov dl,qty5_report
+    add dl,30h
+    int 21h
+    mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,09h
     lea dx,product5_report
     int 21h
+    mov ax,total_item5_report
+    xor dx,dx
+    call printDecimalProc
+    call printOutput
     call n_line
 
     ;print n_line
@@ -1462,6 +1614,60 @@ report proc
     mov ah,09h
     lea dx,total_attempt_report
     int 21h
+    xor dx,dx
+    mov ax,total_attempt
+    ;store whole and decimal
+    mov whole_number,ax
+
+print_attempt:
+    ;separate result_whole
+    xor dx,dx
+    xor ax,ax
+    mov ax,whole_number
+    mov bx,10
+    div bx
+    mov result_whole_single,dl
+    
+    ;check if al more than 9
+    cmp al,10
+    jge hund_place_attempt
+    cmp al,0
+    je print_whole_single_attempt
+    mov result_whole_tens,al
+    jmp print_whole_tens_attempt
+
+hund_place_attempt:
+    xor dx,dx
+    div bx
+    mov result_whole_tens,dl
+    mov result_whole_hund,al
+
+print_whole_attempt:
+
+    ;print hund number
+    xor ax,ax
+    xor dx,dx
+    mov dl,result_whole_hund
+    add dl,30h
+    mov ah,02h
+    int 21h
+
+print_whole_tens_attempt:
+
+    ;print tens number
+    mov dl,result_whole_tens
+    add dl,30h
+    mov ah,02h
+    int 21h
+
+print_whole_single_attempt:
+
+    ;print single number
+    mov dl,result_whole_single
+    add dl,30h
+    mov ah,02h
+    int 21h
+
     call n_line
 
     ;print n_line
@@ -1515,35 +1721,135 @@ receipt proc
     call line
     call n_line
 
+item1_receipt:
+    ;check item existence
+    cmp qty1,0
+    je item2_receipt
+    inc [receipt_content]
+
     ;print item1
     mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,02h
+    mov dl,qty1
+    add dl,30h
+    int 21h
+    mov ah,09h
+    lea dx,space2
+    int 21h
     lea dx,product1_report
     int 21h
+    xor dx,dx
+    mov ax,total_item1
+    call printDecimalProc
+    call printOutput
     call n_line
+
+item2_receipt:
+    ;check item existence
+    cmp qty2,0
+    je item3_receipt
+    inc [receipt_content]
 
     ;print item2
     mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,02h
+    mov dl,qty2
+    add dl,30h
+    int 21h
+    mov ah,09h
+    lea dx,space2
+    int 21h
     lea dx,product2_report
     int 21h
+    xor dx,dx
+    mov ax,total_item2
+    call printDecimalProc
+    call printOutput
     call n_line
+
+item3_receipt:
+    ;check item existence
+    cmp qty3,0
+    je item4_receipt
+    inc [receipt_content]
 
     ;print item3
     mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,02h
+    mov dl,qty3
+    add dl,30h
+    int 21h
+    mov ah,09h
+    lea dx,space2
+    int 21h
     lea dx,product3_report
     int 21h
+    xor dx,dx
+    mov ax,total_item3
+    call printDecimalProc
+    call printOutput
     call n_line
+
+item4_receipt:
+    ;check item existence
+    cmp qty4,0
+    je item5_receipt
+    inc [receipt_content]
 
     ;print item4
     mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,02h
+    mov dl,qty4
+    add dl,30h
+    int 21h
+    mov ah,09h
+    lea dx,space2
+    int 21h
     lea dx,product4_report
     int 21h
+    xor dx,dx
+    mov ax,total_item4
+    call printDecimalProc
+    call printOutput
     call n_line
+
+item5_receipt:
+    ;check item existence
+    cmp qty5,0
+    je end_item5
+    inc [receipt_content]
 
     ;print item5
     mov ah,09h
+    lea dx,space2
+    int 21h
+    mov ah,02h
+    mov dl,qty5
+    add dl,30h
+    int 21h
+    mov ah,09h
+    lea dx,space2
+    int 21h
     lea dx,product5_report
     int 21h
+    xor dx,dx
+    mov ax,total_item5
+    call printDecimalProc
+    call printOutput
     call n_line
+
+end_item5:
+    ;check receipt product
+    cmp receipt_content,0
+    je continue_endReceipt_empty
 
     ;print n_line
     call n_line
@@ -1552,13 +1858,19 @@ receipt proc
     mov ah,09h
     lea dx,subtotal_title_receipt
     int 21h
+    xor dx,dx
+    mov ax,subtotal
+    call printDecimalProc
+    call printOutput
     call n_line
 
     ;print discount
     mov ah,09h
     lea dx,discount_title_receipt
     int 21h
+    xor dx,dx
     call calculatePromotion
+    call printOutput
     call n_line
 
     ;print line
@@ -1569,21 +1881,32 @@ receipt proc
     mov ah,09h
     lea dx,discounted_title_receipt
     int 21h
+    xor dx,dx
     call calculateDiscountedPrice
+    call printOutput
     call n_line
+    jmp continue_tax
 
+continue_endReceipt_empty:
+    jmp endReceipt_empty
+
+continue_tax:
     ;print tax
     mov ah,09h
     lea dx,tax_title_receipt
     int 21h
+    xor dx,dx
     call calculateTax
+    call printOutput
     call n_line
 
     ;print final price
     mov ah,09h
     lea dx,total_price_receipt
     int 21h
-    call calculateDiscountedPrice
+    xor dx,dx
+    call calculatePriceAfterTax
+    call printOutput
     call n_line
 
     ;print line
@@ -1599,7 +1922,23 @@ receipt proc
     ;print line
     call line
     call n_line
+    jmp endReceipt_purchased
 
+endReceipt_empty:
+    call clearScreen
+
+endReceipt_purchased:
+    mov qty1,0
+    mov qty2,0
+    mov qty3,0
+    mov qty4,0
+    mov qty5,0
+    mov total_item1,0
+    mov total_item2,0
+    mov total_item3,0
+    mov total_item4,0
+    mov total_item5,0
+    mov subtotal,0
     ret
 
 receipt endp
@@ -1648,5 +1987,22 @@ clearScreen proc
 	int 10h
 	ret
 clearScreen endp
+
+printDecimalProc proc
+
+    ;separate whole and decimal
+    mov bx,100
+    div bx
+
+    ;store whole and decimal
+    mov whole_number,ax
+    mov ax,dx
+    xor dx,dx
+    mul bx
+    mov decimal_number,ax
+
+    ret
+
+printDecimalProc endp
 
 end main
