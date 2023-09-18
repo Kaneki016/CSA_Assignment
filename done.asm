@@ -10,7 +10,6 @@
     decimal_number dw ?
     total_number dw ?
     subtotal dw ?
-    payment_price dw ?
     result_whole_thou db ?
     result_whole_hund db ?
     result_whole_single db ?
@@ -179,7 +178,7 @@ mainMenu_proc:
 	je orderMenu_proc	;sales
 	cmp al,'3'
 	je toLogout
-    jmp errorMsg_mainMenu
+    jmp endProgram_main
 
     toRegistration:
     call registration
@@ -190,14 +189,6 @@ mainMenu_proc:
     cmp [successLogout],0
     je mainMenu_proc
     jmp login_proc
-
-    errorMsg_mainMenu:
-    call n_line
-    mov ah,09h
-    lea dx,errorMsg
-    int 21h
-    call n_line
-    jmp mainMenu_proc
 
 orderMenu_proc:
     call order_menu
@@ -238,6 +229,14 @@ receipt_proc:
     int 21h
     call n_line
     jmp check_another_order
+
+endProgram_main:
+    call report
+	mov ah,09h
+	lea dx,exitMsg
+	int 21h
+	mov ah,4ch
+	int 21h
 
 main endp
 
@@ -1494,7 +1493,6 @@ endReceipt_purchased:
     mov total_item4,0
     mov total_item5,0
     mov subtotal,0
-    mov payment_price,0
     ret
 
 receipt endp
@@ -1741,6 +1739,7 @@ registerSuccess:
 	mov ah,09h
 	lea dx,registerSuccessMsg
 	int 21h
+    call n_line
 	ret ;to main menu
 
 WriteError:
