@@ -1,0 +1,86 @@
+;variable for calculateBalance
+    cash dw ?
+	subtotal dw ?
+	balance dw ?
+    remaining dw ?
+    ask_for_payment db "Payment amount: RM ",'$'
+    payment label byte
+    maxPayment db 9
+    actualPayment db ?
+    inputPayment db 9 dup ('$')
+	message db "Your balance is: RM ",'$' 
+	message2 db "Your remaining amount is:RM ",'$'
+	message3 db "Payment successfully ! ",'$'
+
+balanceProc proc
+
+    mov ah,09h
+    lea dx,ask_for_payment
+    int 21h
+    xor ax,ax
+    xor dx,dx
+    ;get input string
+    mov ah,0ah
+    lea dx,payment
+    int 21h
+    lea dx,payment+2
+    mov bx,dx
+    mov bl,[bx-1]
+    mov bh,0
+    add bx,dx
+    mov byte [bx],"$"
+    mov ah,09h
+    int 21h
+
+    mov cash,ax
+    mov ax,cash
+	mov bx,subtotal
+
+	cmp ax,bx
+	jg calculate_balance
+	jl calculate_remaining
+	je continue_display_message
+
+calculate_balance:
+    sub ax,bx   ; Calculate balance (cashReceive - subtotal)
+    mov balance,ax
+    jmp display_balance
+
+continue_display_message:
+    jmp display_message
+
+display_balance:
+
+    ;print balance message
+    mov ah,09h
+    lea dx,message
+    int 21h
+    xor ax,ax
+    xor dx,dx
+    call printOutput
+	jmp end_program
+
+calculate_remaining:
+	SUB bx,ax		; Calculate remaining (subtotal - cashReceive)		
+	mov remaining,bx
+    jmp display_remaining
+
+display_remaining:
+    mov ah,09h
+    lea dx,message2
+    int 21h
+    xor ax,ax
+    xor dx,dx
+    call printOutput
+	jmp end_program
+
+display_message:
+	MOV AH, 09h
+	lea dx, newline     	; DOS function to print a string
+	lea dx, message3  	; Load the message 
+	INT 21h 		; Call DOS to print the message
+
+endBalance:
+    ret
+
+balanceProc endp
